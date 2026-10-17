@@ -1,3 +1,5 @@
+from idlelib.debugobj_r import remote_object_tree_item
+
 import numpy as np
 
 def free_fall_dynamics(state, params):
@@ -60,3 +62,50 @@ def thrust_direction(alpha, beta):
     z = np.cos(alpha) * np.cos(beta)
 
     return np.array([x, y, z])
+
+def dynamics(state, control, params):
+    """
+    The REAL equations of motion: gravity + engine thrust + fuel burn.
+    No air resistance yet (see docs/assumptions.md - that's delibaretely
+    left out of this first version
+
+    state = [x, y, z, vx, vy, vz, m] (see free_fall_dynamics for details)
+    control = [thrust, alpha, beta]
+        thrust - engine force magnitude, in NEWTONS (NOT yet clamped to
+        [min_thrust, max_thrust] here - that constraint is enforced
+        elsewhere, e.g. by whoever picks 'control', or later by the
+        optimizer/controller. This function just computes physics
+        for whatever thrust value it's given.)
+    alpha, beta - steering angles, in RADIANS (see thrust_direction)
+    """
+    velocity = state[3:6]
+    mass = state[6]
+
+    thrust, alpha, beta = control
+
+    # Gravity pulls straight sown, same as in the free_fall_dynamics - this
+    # does NOT depend on mass (that's the classic "all objects fall at the
+    # same rate" fact: gravity is an ACCELERATION, not a force here).
+    gravity_acceleration = np.array([0.0, 0.0, 0.0 - params.g])
+
+
+
+    # Thrust is a FORCE (in Newtons): magnitude `thrust` times the unit
+    # direction vector from thrust_direction(). To turn a force into an
+    # acceleration we divide by the CURRENT mass (Newton's second law,
+    # a = F/m) this is why a rocket accelerates harder and harder as it
+    # burns fuel and gets lighter, even with constant thrust.
+    direction = thrust_direction(alpha, beta)
+    thrust_acceleration = thrust * direction / mass
+
+    # Total acceleration felt by the rocket's center of mass: both effects
+    # just add up as vectors (gravity doesn't care about thrust, and thrust
+    # doesn't care about gravity).
+    acceleration = gravity_acceleration + thrust_acceleration
+
+    # Mass flow equation (see params.py comment on isp): the bigger the
+    # thrust, the faster fuel is burned. mass_rate is NEGATIVE bcs mass
+    # is decreasing (we are losing propellant, not gaining it).
+    mass_rate = -thrust / (params.isp * params.g0)
+
+    return np.concatenate([velocity, acceleration, [mass_rate]])
