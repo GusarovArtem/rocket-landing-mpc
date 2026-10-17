@@ -1,0 +1,31 @@
+[build-system]
+# These two lines tell pip HOW to build/install this project.
+# setuptools is the classic, most common Python build tool.
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rocket-landing-mpc"
+version = "0.1.0"
+description = "Autonomous rocket landing with Model Predictive Control (thesis project)"
+requires-python = ">=3.11"
+
+# Third-party libraries our code imports. pip will install these
+# automatically when we run `pip install -e .`.
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "casadi",
+]
+
+[project.optional-dependencies]
+# Extra tools only needed for development/testing, not for running the
+# simulator itself. Install with: pip install -e ".[dev]"
+dev = [
+    "pytest",
+]
+
+[tool.setuptools.packages.find]
+# Our actual code lives in src/rocket_landing/, not in the repo root.
+where = ["src"]
