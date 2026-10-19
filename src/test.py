@@ -1,17 +1,23 @@
 import numpy as np
 from rocket_landing.params import VehicleParams
-from rocket_landing.dynamics import dynamics
+from rocket_landing.integrators import euler_step
 
 p = VehicleParams()
 state = np.array([0.0, 0.0, 1000.0, 0.0, 0.0, 0.0, p.initial_mass])
+control_zero_thrust = np.array([0.0, 0.0, 0.0])
 
-# Case 1: zero thrust -> should be IDENTICAL to free_fall_dynamics.
-control_zero_thrsut = np.array([0.0,0.0,0.0])
-print(dynamics(state, control_zero_thrsut, p))
+dt = 0.1
+for _ in range(10):
+    state = euler_step(state, control_zero_thrust, p, dt)
 
-# Case 2: HOVER TEST - thrust exactly cancels gravity, straight up
-# (alpha = beta = 0). weight = mass * g is the force needed to exactly
-# cancel gravity at this instant.
-weight = p.initial_mass * p.g
-control_hover = np.array([weight, 0.0, 0.0])
-print(dynamics(state, control_hover, p))
+
+print("z (height) after 1s:", state[2])
+print("vz (vert. speed) after 1s:", state[5])
+
+
+# Compare against the EXACT textbook formulas for constant-acceleration
+# free fall (no integrator involved at all - pure algebra):
+g = p.g
+t = 1.0
+print("exact z(1):", 1000.0 - 0.5 * g * t**2)
+print ("exact vz(1):", -g * t)
