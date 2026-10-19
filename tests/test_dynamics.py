@@ -1,5 +1,3 @@
-from timeit import dummy_src_name
-
 import numpy as np
 import pytest
 from scipy.differentiate import derivative
