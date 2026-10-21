@@ -11,7 +11,7 @@
 > po angielsku do ręcznego przepisania do właściwego pliku projektu. Po przepisaniu
 > i odpaleniu, zgłaszasz wynik, a ja odhaczam krok i podaję następny.
 
-**AKTUALNY KROK: 24**
+**AKTUALNY KROK: 25**
 
 ## Faza A — Setup i porządki
 
@@ -98,9 +98,11 @@ CasADi/IPOPT, struktura katalogów na miejscu.* ✅ ZALICZONY
 - [x] 23. Definicja celu (lądowisko, zerowa prędkość) w `reference.py`.
       Zweryfikowana w konsoli: `target.position = [0,0,0]`,
       `target.velocity = [0,0,0]` ✓.
-- [ ] 24. Prosty PID na prędkość pionową (`controllers/pid.py`).
-      **← następny krok w `CODE_TO_BE_REWRITTEN.py`**
+- [x] 24. Prosty PID na prędkość pionową (`controllers/pid.py`). Zweryfikowany
+      w konsoli: 3x ta sama error=5.0 → 10.25, 10.5, 10.75 (zgodne z ręcznym
+      rachunkiem, narastanie o 0.25 dzięki członowi I) ✓.
 - [ ] 25. Test PID w zamkniętej pętli — tylko ruch pionowy, ręczne dostrojenie.
+      **← następny krok w `CODE_TO_BE_REWRITTEN.py`**
 - [ ] 26. Rozszerzenie PID na pozycję poziomą (x, y).
 - [ ] 27. Pętla symulacji w zamkniętym obiegu (`simulation.py`): stan → regulator
       → fizyka.
