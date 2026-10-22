@@ -1,15 +1,19 @@
 import numpy as np
 
+from rocket_landing.params import VehicleParams
 from rocket_landing.controllers.pid import PIDController
+from rocket_landing.simulation import simulate_vertical_pid
 
-pid = PIDController(kp=2.0, ki=0.5, kd=0.1)
 
+p = VehicleParams()
+pid = PIDController(kp=5000.0, ki=0.0, kd=2500.0)
 
-# Feed is SAME 3 error 3 imes in a roe (as if vz were stuck,
-# no improving at all) - this maked it easy to hand-check both
-# the integral term (should grow by a fixed amount each call) and the
-# derivative term (should be exactly 0 after the first call,
-# since a REPEATED error isn't changing).
-print(pid.compute(error=5.0, dt=0.1))
-print(pid.compute(error=5.0, dt=0.1))
-print(pid.compute(error=5.0, dt=0.1))
+# Same starting point at step 21: at rest, 500 m up
+state0 = np.array([0.0, 0.0, 500.0, 0.0, 0.0, 0.0, p.initial_mass])
+
+times, states = simulate_vertical_pid(state0, pid, p, dt=0.05)
+
+print("landed after:", times[-1], "s")
+print("touchdown height:", states[-1][2])
+print("touchdown vz:", states[-1][5])
+print("touchdown mass:", states[-1][6])
